@@ -84,10 +84,16 @@ object SemigroupTest extends TestSuite {
         Map(1 → List(1, 2))
     }
     "Appending Map + Option[A]" - {
+      import scalaz._
+      import Scalaz._
       Map(1 → "x") ++ Some(2 → "y") ==>
         Map(1 → "x", 2 → "y")
+      Map(1 → "x") ++ Some(1 → "y") ==>
+        Map(1 → "y")
       Map(1 → "x") ++ None ==>
         Map(1 → "x")
+      (Map(1 → "x") |+| Map(1 → "x")) ==>
+        Map(1 → "xx")
     }
   }
 }
