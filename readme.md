@@ -146,3 +146,4 @@ Semigroup[Int].append(1,2) == 3
 [iterator-pattern-pdf]: http://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf 
 [applicative programming with effects]: http://www.staff.city.ac.uk/~ross/papers/Applicative.html
 [type classes in scala with dan rosen]: https://www.youtube.com/watch?v=sVMES4RZF-8
+[railway oriented programming]: http://fsharpforfunandprofit.com/rop/
