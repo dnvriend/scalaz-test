@@ -68,6 +68,11 @@ object ValidationTest extends TestSuite {
       ("failure a".failureNel *> "failure b".failureNel *> "".successNel) ==>
         Failure(NonEmptyList("failure a", "failure b"))
     }
+    'fromTryCatchNonFatal - {
+      (Validation.fromTryCatchNonFatal[Int](1 / 0).leftMap(t ⇒ t.getMessage).toValidationNel[String, Int] *>
+        Validation.fromTryCatchNonFatal[Int](1).leftMap(t ⇒ t.getMessage).toValidationNel[String, Int]) ==>
+        Failure(NonEmptyList("/ by zero"))
+    }
     'validatePaymentAccount - {
       val paymentAccount = PaymentAccount(0, "")
       (PaymentAccountValidation.validateIban(paymentAccount) *>
