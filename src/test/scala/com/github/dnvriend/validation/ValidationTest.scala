@@ -21,6 +21,16 @@ import scalaz._
 import Scalaz._
 
 object ValidationTest extends TestSuite {
+  // see: http://eed3si9n.com/learning-scalaz/Validation.html
+  // see: http://www.47deg.com/blog/fp-for-the-average-joe-part-1-scalaz-validation
+  // see: http://bytes.codes/2015/04/10/a-skeptics-guide-to-scalaz-part-1-disjunctions/
+  // see: http://bytes.codes/2015/04/13/a-skeptics-guide-to-scalaz-gateway-drugs-part-2-options-with-disjunction/
+  // see: learning scalaz: https://www.youtube.com/watch?v=jyMIvcUxOJ0
+  // see: scalaz - the good parts: https://www.youtube.com/watch?v=jPdHQZnF56A
+  // see: scalaz - for the rest of us: https://www.youtube.com/watch?v=kcfIH3GYXMI
+  // see: scalaz - state monad: https://www.youtube.com/watch?v=Jg3Uv_YWJqI
+  // see: A Skeptic's Look at Scalaz Gateway Drugs: https://www.youtube.com/watch?v=lF9OVD0_Boc
+
   val tests = this{
     'success - {
       "".successNel ==>
