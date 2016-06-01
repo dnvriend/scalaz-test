@@ -152,5 +152,11 @@ object ApplicativeTest extends TestSuite {
       cartesianThree(26 * 26 * 26 - 1) ==>
         "ZZZ"
     }
+    'tuple - {
+      (Option(1) tuple Option(2)) ==>
+        Option((1, 2))
+      (List(1, 2) tuple List(3, 4)) ==>
+        List((1, 3), (1, 4), (2, 3), (2, 4))
+    }
   }
 }
