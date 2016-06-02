@@ -73,6 +73,24 @@ object ValidationTest extends TestSuite {
         Validation.fromTryCatchNonFatal[Int](1).leftMap(t ⇒ t.getMessage).toValidationNel[String, Int]) ==>
         Failure(NonEmptyList("/ by zero"))
     }
+    'FoldingListOfFailures - {
+      NonEmptyList("failure a".failureNel[String], "failure b".failureNel[String], "failure c".failureNel[String]).foldLeft(List.empty[String].successNel[String]) {
+        case (acc, v) ⇒ (acc |@| v)(_ :+ _)
+      } ==> Failure(NonEmptyList("failure a", "failure b", "failure c"))
+    }
+    'accumulatingValidation - {
+      def validate(msg: String): ValidationNel[String, String] = s"failure $msg".failureNel[String]
+      val listToValidate = NonEmptyList("a", "b", "c")
+      listToValidate.traverseU(validate) ==>
+        Failure(NonEmptyList("failure a", "failure b", "failure c"))
+    }
+    "fromTryCatchNonFatal in for comprehension must be a disjunction as Validation is not a Monad but an Applicative" - {
+      def throwException: Int = throw new RuntimeException("test")
+      (for {
+        a ← Validation.fromTryCatchNonFatal(1).disjunction.leftMap(_.getMessage)
+        b ← Validation.fromTryCatchNonFatal[Int](throwException).disjunction.leftMap(_.getMessage)
+      } yield a + b).validationNel ==> Failure(NonEmptyList("test"))
+    }
     'validatePaymentAccount - {
       val paymentAccount = PaymentAccount(0, "")
       (PaymentAccountValidation.validateIban(paymentAccount) *>

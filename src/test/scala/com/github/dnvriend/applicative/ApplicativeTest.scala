@@ -25,14 +25,17 @@ import scala.language.postfixOps
 object ApplicativeTest extends TestSuite {
   // from: http://eed3si9n.com/learning-scalaz/Applicative.html
 
+  // applicative operations and symbols are all related to applying a function
+
   val tests = this{
     // let's build up to Applicatives
     'TheProblem - {
-      val functionThatTakesTwoParameters = (_: Int) * (_: Int)
+      val functionThatTakesTwoParameters: (Int, Int) ⇒ Int = (_: Int) * (_: Int)
       // notice that we have a function with 2 parameters, we cannot use that let's curry it:
-      val functionThatTakesTwoParametersCurried = functionThatTakesTwoParameters.curried
-      // notice, we now have a Function with 1 parameter
-      val functionsInContext = List(1, 2, 3) map functionThatTakesTwoParametersCurried
+      val curriedFunction: Int ⇒ Int ⇒ Int = functionThatTakesTwoParameters.curried
+      // notice, the function looks more how Haskell defines functions that take multiple parameters
+      // we can now apply the values 1, 2, 3 to the curried function; it will return a function Int => Int
+      val functionsInContext: List[Int ⇒ Int] = List(1, 2, 3) map curriedFunction
       // we now have functions in a context that we can apply eg. with the value '9':
       functionsInContext.map(_(9)) ==>
         List(9, 18, 27)
@@ -47,16 +50,16 @@ object ApplicativeTest extends TestSuite {
       1.point[Option] ==>
         Some(1)
 
-      1.point[Option].map(_ + 2) ==>
+      1.point[Option].map(_ |+| 2) ==>
         Some(3)
 
-      1.point[List].map(_ + 2) ==>
+      1.point[List].map(_ |+| 2) ==>
         List(3)
     }
     "<*> - from the Applicative type class" - {
       // <*> is a beefed-up map.
-      // map takes a function and a functor, and applies the function inside the functor value
-      // <*> takes a functor that has a function in it, and another functor with a value in it,
+      // 'map' takes a function and a functor, and applies the function inside the functor value
+      // '<*>' takes a functor that has a function in it, and another functor with a value in it,
       //    1. extracts that function from the first functor,
       //    2. and then maps it over the second one
 
@@ -74,6 +77,10 @@ object ApplicativeTest extends TestSuite {
       (1.some <* 2.some) ==>
         1.some
 
+      val f = (_: Int) + 2
+      (1.some <* f.some) ==>
+        1.some
+
       // legend:
       // *> returns the rhs
       (None *> None) ==>
@@ -88,10 +95,13 @@ object ApplicativeTest extends TestSuite {
       (1.some *> 2.some) ==>
         2.some
 
+      (1.some *> f.some) ==>
+        Option(f)
+
       // legend:
       // <*> combining their results by function application
-      (1.some <*> Option((_: Int) + 3)) ==>
-        Some(4)
+      (1.some <*> f.some) ==>
+        3.some
 
       val curriedSumFunction: Int ⇒ Int ⇒ Int = ((_: Int) + (_: Int)).curried
       val appliedCurriedSumFunction: Option[Int ⇒ Int] = 9.some <*> curriedSumFunction.some
@@ -100,24 +110,49 @@ object ApplicativeTest extends TestSuite {
     }
     'ApplicativeStyle - {
       // legend:
-      // '^' extracts values from containers and apply them to a single function
+      // '^' extracts values from two containers and apply them to a single function
       // It is a symbol for apply2 from the 'Apply' type class
       // This is useful for the 1 function case that we don't need to put inside a container
 
       // The type signature is the following:
       // (Option[Int], Option[Int]) ((A, B) => C)
-      ^(3.some, 5.some)(_ + _) ==>
+      ^(3.some, 5.some)(_ |+| _) ==>
         8.some
 
-      ^(3.some, none[Int])(_ + _) ==>
+      ^(3.some, none[Int])(_ |+| _) ==>
         None
+
+      // legend:
+      // '^^' does the same but then for three applicatives
+      ^^(1.some, 2.some, 3.some)(_ |+| _ |+| _) ==>
+        6.some
+
+      // legend:
+      // '^^^' does the same but then for four applicatives
+      ^^^(1.some, 2.some, 3.some, 4.some)(_ |+| _ |+| _ |+| _) ==>
+        10.some
+
+      // legend:
+      // '^^^^' .. five applicatives
+      ^^^^(1.some, 2.some, 3.some, 4.some, 5.some)(_ |+| _ |+| _ |+| _ |+| _) ==>
+        15.some
+
+      // legend:
+      // '^^^^^' .. six applicatives
+      ^^^^^(1.some, 2.some, 3.some, 4.some, 5.some, 6.some)(_ |+| _ |+| _ |+| _ |+| _ |+| _) ==>
+        21.some
+
+      // legend:
+      // '^^^^^^' .. seven applicatives
+      ^^^^^^(1.some, 2.some, 3.some, 4.some, 5.some, 6.some, 7.some)(_ |+| _ |+| _ |+| _ |+| _ |+| _ |+| _) ==>
+        28.some
 
       // legend:
       // '|@|' is a symbol for constructing Applicative expressions.
       // (f1 |@| f2 |@| ... |@| fn)((v1, v2, ... vn) => ...)
       // (f1 |@| f2 |@| ... |@| fn).tupled
 
-      (3.some |@| 5.some)(_ + _) ==>
+      (3.some |@| 5.some)(_ |+| _) ==>
         8.some
 
       (3.some |@| 4.some |@| 5.some)(_ |+| _ |+| _) ==>
@@ -152,7 +187,7 @@ object ApplicativeTest extends TestSuite {
       cartesianThree(26 * 26 * 26 - 1) ==>
         "ZZZ"
     }
-    'tuple - {
+    "tuple applicative operation" - {
       (Option(1) tuple Option(2)) ==>
         Option((1, 2))
       (List(1, 2) tuple List(3, 4)) ==>
