@@ -104,15 +104,54 @@ object ValidationTest extends TestSuite {
         case _           ⇒ ""
       }) ==> "iban is empty,payment account id is invalid, should be > 0"
     }
+    "lifting functions into an applicative function using '|@|'" - {
+      // see: http://stackoverflow.com/questions/17711895/scalaz-validation-with-applicative-functor-not-working
+
+      // scalaz's applicative functor symbol '|@|' provides a way to lift a function into an applicative functor
+
+      // suppose we have the following results:
+      val xs: ValidationNel[String, List[Int]] = "Error!".failureNel
+      val ys: ValidationNel[String, List[Int]] = List(1, 2, 3).successNel
+      val zs: ValidationNel[String, List[Int]] = List(4, 5).successNel
+
+      // we can lift the concatenation function (_: List[Int]) ++ (_: List[Int]) into the Validation like this:
+      val f: (List[Int], List[Int]) ⇒ List[Int] = (_: List[Int]) ++ (_: List[Int])
+      (ys |@| zs)(f) ==>
+        Success(List(1, 2, 3, 4, 5))
+
+      // because scala can infert the types we can inline the function
+      (ys |@| zs)(_ ++ _) ==>
+        Success(List(1, 2, 3, 4, 5))
+
+      (xs |@| ys)(_ ++ _) ==>
+        Failure(NonEmptyList("Error!"))
+
+      (xs |@| xs)(_ ++ _) ==>
+        Failure(NonEmptyList("Error!", "Error!"))
+    }
+    "Appending validations using the '+++' operator" - {
+      ("Success 1".successNel +++ "Success 2".successNel) ==>
+        Success("Success 1Success 2")
+
+      ("Success 1".successNel[String] |+| "Success 2".successNel[String]) ==>
+        Success("Success 1Success 2")
+
+      ("Success 1".successNel[String] |@| "Success 2".successNel[String])(_ |+| _) ==>
+        Success("Success 1Success 2")
+
+      ("Success 1".successNel[String] |+| "Success 2".successNel[String]) ==>
+        ("Success 1".successNel[String] |@| "Success 2".successNel[String])(_ |+| _)
+    }
   }
 
-  object PaymentAccountValidation {
-    def validateIban(paymentAccount: PaymentAccount): ValidationNel[String, PaymentAccount] =
-      if (Option(paymentAccount.iban).exists(_.isEmpty)) "iban is empty".failureNel else paymentAccount.successNel[String]
-
-    def validateId(paymentAccount: PaymentAccount): ValidationNel[String, PaymentAccount] =
-      if (paymentAccount.id <= 0) "payment account id is invalid, should be > 0".failureNel else paymentAccount.successNel[String]
-  }
-
-  case class PaymentAccount(id: Long, iban: String)
 }
+
+object PaymentAccountValidation {
+  def validateIban(paymentAccount: PaymentAccount): ValidationNel[String, PaymentAccount] =
+    if (Option(paymentAccount.iban).exists(_.isEmpty)) "iban is empty".failureNel else paymentAccount.successNel[String]
+
+  def validateId(paymentAccount: PaymentAccount): ValidationNel[String, PaymentAccount] =
+    if (paymentAccount.id <= 0) "payment account id is invalid, should be > 0".failureNel else paymentAccount.successNel[String]
+}
+
+case class PaymentAccount(id: Long, iban: String)
