@@ -5,8 +5,8 @@ version := "1.0.0"
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= Seq(
-   "org.scalaz" %% "scalaz-core" % "7.2.3",
-   "com.lihaoyi" %% "utest" % "0.4.3" % Test
+    "org.scalaz" %% "scalaz-core" % "7.2.5",
+    "org.scalatest" %% "scalatest" % "3.0.0" % Test
 )
 
 testFrameworks += new TestFramework("utest.runner.Framework")
@@ -22,7 +22,6 @@ SbtScalariform.autoImport.scalariformPreferences := SbtScalariform.autoImport.sc
   .setPreference(AlignSingleLineCaseStatements, true)
   .setPreference(AlignSingleLineCaseStatements.MaxArrowIndent, 100)
   .setPreference(DoubleIndentClassDeclaration, true)
-  .setPreference(RewriteArrowSymbols, true)
 
 // enable updating file headers //
 import de.heikoseeberger.sbtheader.license.Apache2_0

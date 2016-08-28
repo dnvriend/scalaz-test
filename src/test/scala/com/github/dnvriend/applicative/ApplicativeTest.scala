@@ -16,182 +16,183 @@
 
 package com.github.dnvriend.applicative
 
-import utest._
+import com.github.dnvriend.TestSpec
 
 import scalaz._
 import Scalaz._
 import scala.language.postfixOps
 
-object ApplicativeTest extends TestSuite {
+class ApplicativeTest extends TestSpec {
   // from: http://eed3si9n.com/learning-scalaz/Applicative.html
 
   // applicative operations and symbols are all related to applying a function
 
-  val tests = this{
-    // let's build up to Applicatives
-    'TheProblem - {
-      val functionThatTakesTwoParameters: (Int, Int) ⇒ Int = (_: Int) * (_: Int)
-      // notice that we have a function with 2 parameters, we cannot use that let's curry it:
-      val curriedFunction: Int ⇒ Int ⇒ Int = functionThatTakesTwoParameters.curried
-      // notice, the function looks more how Haskell defines functions that take multiple parameters
-      // we can now apply the values 1, 2, 3 to the curried function; it will return a function Int => Int
-      val functionsInContext: List[Int ⇒ Int] = List(1, 2, 3) map curriedFunction
-      // we now have functions in a context that we can apply eg. with the value '9':
-      functionsInContext.map(_(9)) ==>
-        List(9, 18, 27)
-    }
-    "point - from the Applicative type class" - {
-      // The Applicative type class defines the methods 'pure/point'
-      // 'pure' takes a value and puts it in a minimal context that still yields that value
-      // The 'context' constructor has been absracted
-      1.point[List] ==>
-        List(1)
+  // let's build up to Applicatives
+  it should 'TheProblem in {
+    val functionThatTakesTwoParameters: (Int, Int) ⇒ Int = (_: Int) * (_: Int)
+    // notice that we have a function with 2 parameters, we cannot use that let's curry it:
+    val curriedFunction: Int ⇒ Int ⇒ Int = functionThatTakesTwoParameters.curried
+    // notice, the function looks more how Haskell defines functions that take multiple parameters
+    // we can now apply the values 1, 2, 3 to the curried function; it will return a function Int => Int
+    val functionsInContext: List[Int ⇒ Int] = List(1, 2, 3) map curriedFunction
+    // we now have functions in a context that we can apply eg. with the value '9':
+    functionsInContext.map(_(9)) shouldBe List(9, 18, 27)
+  }
 
-      1.point[Option] ==>
-        Some(1)
+  it should "point - from the Applicative type class" in {
+    // The Applicative type class defines the methods 'pure/point'
+    // 'pure' takes a value and puts it in a minimal context that still yields that value
+    // The 'context' constructor has been absracted
+    1.point[List] shouldBe
+      List(1)
 
-      1.point[Option].map(_ |+| 2) ==>
-        Some(3)
+    1.point[Option] shouldBe
+      Some(1)
 
-      1.point[List].map(_ |+| 2) ==>
-        List(3)
-    }
-    "<*> - from the Applicative type class" - {
-      // <*> is a beefed-up map.
-      // 'map' takes a function and a functor, and applies the function inside the functor value
-      // '<*>' takes a functor that has a function in it, and another functor with a value in it,
-      //    1. extracts that function from the first functor,
-      //    2. and then maps it over the second one
+    1.point[Option].map(_ |+| 2) shouldBe
+      Some(3)
 
-      // legend:
-      // <* returns the lhs
-      (None <* None) ==>
-        None
+    1.point[List].map(_ |+| 2) shouldBe
+      List(3)
+  }
 
-      (1.some <* None) ==>
-        None
+  it should "<*> - from the Applicative type class" in {
+    // <*> is a beefed-up map.
+    // 'map' takes a function and a functor, and applies the function inside the functor value
+    // '<*>' takes a functor that has a function in it, and another functor with a value in it,
+    //    1. extracts that function from the first functor,
+    //    2. and then maps it over the second one
 
-      (None <* 2.some) ==>
-        None
+    // legend:
+    // <* returns the lhs
+    (None <* None) shouldBe
+      None
 
-      (1.some <* 2.some) ==>
-        1.some
+    (1.some <* None) shouldBe
+      None
 
-      val f = (_: Int) + 2
-      (1.some <* f.some) ==>
-        1.some
+    (None <* 2.some) shouldBe
+      None
 
-      // legend:
-      // *> returns the rhs
-      (None *> None) ==>
-        None
+    (1.some <* 2.some) shouldBe
+      1.some
 
-      (1.some *> None) ==>
-        None
+    val f = (_: Int) + 2
+    (1.some <* f.some) shouldBe
+      1.some
 
-      (None *> 2.some) ==>
-        None
+    // legend:
+    // *> returns the rhs
+    (None *> None) shouldBe
+      None
 
-      (1.some *> 2.some) ==>
-        2.some
+    (1.some *> None) shouldBe
+      None
 
-      (1.some *> f.some) ==>
-        Option(f)
+    (None *> 2.some) shouldBe
+      None
 
-      // legend:
-      // <*> combining their results by function application
-      (1.some <*> f.some) ==>
-        3.some
+    (1.some *> 2.some) shouldBe
+      2.some
 
-      val curriedSumFunction: Int ⇒ Int ⇒ Int = ((_: Int) + (_: Int)).curried
-      val appliedCurriedSumFunction: Option[Int ⇒ Int] = 9.some <*> curriedSumFunction.some
-      (3.some <*> appliedCurriedSumFunction) ==>
-        12.some
-    }
-    'ApplicativeStyle - {
-      // legend:
-      // '^' extracts values from two containers and apply them to a single function
-      // It is a symbol for apply2 from the 'Apply' type class
-      // This is useful for the 1 function case that we don't need to put inside a container
+    (1.some *> f.some) shouldBe
+      Option(f)
 
-      // The type signature is the following:
-      // (Option[Int], Option[Int]) ((A, B) => C)
-      ^(3.some, 5.some)(_ |+| _) ==>
-        8.some
+    // legend:
+    // <*> combining their results by function application
+    (1.some <*> f.some) shouldBe
+      3.some
 
-      ^(3.some, none[Int])(_ |+| _) ==>
-        None
+    val curriedSumFunction: Int ⇒ Int ⇒ Int = ((_: Int) + (_: Int)).curried
+    val appliedCurriedSumFunction: Option[Int ⇒ Int] = 9.some <*> curriedSumFunction.some
+    (3.some <*> appliedCurriedSumFunction) shouldBe
+      12.some
+  }
 
-      // legend:
-      // '^^' does the same but then for three applicatives
-      ^^(1.some, 2.some, 3.some)(_ |+| _ |+| _) ==>
-        6.some
+  it should 'ApplicativeStyle in {
+    // legend:
+    // '^' extracts values from two containers and apply them to a single function
+    // It is a symbol for apply2 from the 'Apply' type class
+    // This is useful for the 1 function case that we don't need to put inside a container
 
-      // legend:
-      // '^^^' does the same but then for four applicatives
-      ^^^(1.some, 2.some, 3.some, 4.some)(_ |+| _ |+| _ |+| _) ==>
-        10.some
+    // The type signature is the following:
+    // (Option[Int], Option[Int]) ((A, B) => C)
+    ^(3.some, 5.some)(_ |+| _) shouldBe
+      8.some
 
-      // legend:
-      // '^^^^' .. five applicatives
-      ^^^^(1.some, 2.some, 3.some, 4.some, 5.some)(_ |+| _ |+| _ |+| _ |+| _) ==>
-        15.some
+    ^(3.some, none[Int])(_ |+| _) shouldBe
+      None
 
-      // legend:
-      // '^^^^^' .. six applicatives
-      ^^^^^(1.some, 2.some, 3.some, 4.some, 5.some, 6.some)(_ |+| _ |+| _ |+| _ |+| _ |+| _) ==>
-        21.some
+    // legend:
+    // '^^' does the same but then for three applicatives
+    ^^(1.some, 2.some, 3.some)(_ |+| _ |+| _) shouldBe
+      6.some
 
-      // legend:
-      // '^^^^^^' .. seven applicatives
-      ^^^^^^(1.some, 2.some, 3.some, 4.some, 5.some, 6.some, 7.some)(_ |+| _ |+| _ |+| _ |+| _ |+| _ |+| _) ==>
-        28.some
+    // legend:
+    // '^^^' does the same but then for four applicatives
+    ^^^(1.some, 2.some, 3.some, 4.some)(_ |+| _ |+| _ |+| _) shouldBe
+      10.some
 
-      // legend:
-      // '|@|' is a symbol for constructing Applicative expressions.
-      // (f1 |@| f2 |@| ... |@| fn)((v1, v2, ... vn) => ...)
-      // (f1 |@| f2 |@| ... |@| fn).tupled
+    // legend:
+    // '^^^^' .. five applicatives
+    ^^^^(1.some, 2.some, 3.some, 4.some, 5.some)(_ |+| _ |+| _ |+| _ |+| _) shouldBe
+      15.some
 
-      (3.some |@| 5.some)(_ |+| _) ==>
-        8.some
+    // legend:
+    // '^^^^^' .. six applicatives
+    ^^^^^(1.some, 2.some, 3.some, 4.some, 5.some, 6.some)(_ |+| _ |+| _ |+| _ |+| _ |+| _) shouldBe
+      21.some
 
-      (3.some |@| 4.some |@| 5.some)(_ |+| _ |+| _) ==>
-        12.some
+    // legend:
+    // '^^^^^^' .. seven applicatives
+    ^^^^^^(1.some, 2.some, 3.some, 4.some, 5.some, 6.some, 7.some)(_ |+| _ |+| _ |+| _ |+| _ |+| _ |+| _) shouldBe
+      28.some
 
-      (3.some |@| 4.some |@| 5.some |@| 6.some)(_ |+| _ |+| _ |+| _) ==>
-        18.some
+    // legend:
+    // '|@|' is a symbol for constructing Applicative expressions.
+    // (f1 |@| f2 |@| ... |@| fn)((v1, v2, ... vn) => ...)
+    // (f1 |@| f2 |@| ... |@| fn).tupled
 
-      (List(1, 2, 3) |@| List(4, 5, 6))(_ |+| _) ==>
-        List(5, 6, 7, 6, 7, 8, 7, 8, 9)
+    (3.some |@| 5.some)(_ |+| _) shouldBe
+      8.some
 
-      val xs = ('A' to 'Z').map(_.toString).toList
-      val cartesianTwo = (xs |@| xs)(_ |+| _)
+    (3.some |@| 4.some |@| 5.some)(_ |+| _ |+| _) shouldBe
+      12.some
 
-      cartesianTwo.size ==>
-        26 * 26
+    (3.some |@| 4.some |@| 5.some |@| 6.some)(_ |+| _ |+| _ |+| _) shouldBe
+      18.some
 
-      cartesianTwo.head ==>
-        "AA"
+    (List(1, 2, 3) |@| List(4, 5, 6))(_ |+| _) shouldBe
+      List(5, 6, 7, 6, 7, 8, 7, 8, 9)
 
-      cartesianTwo(26 * 26 - 1) ==>
-        "ZZ"
+    val xs = ('A' to 'Z').map(_.toString).toList
+    val cartesianTwo = (xs |@| xs)(_ |+| _)
 
-      val cartesianThree = (xs |@| xs |@| xs)(_ |+| _ |+| _)
+    cartesianTwo.size shouldBe
+      26 * 26
 
-      cartesianThree.size ==>
-        26 * 26 * 26
+    cartesianTwo.head shouldBe
+      "AA"
 
-      cartesianThree.head ==>
-        "AAA"
+    cartesianTwo(26 * 26 - 1) shouldBe
+      "ZZ"
 
-      cartesianThree(26 * 26 * 26 - 1) ==>
-        "ZZZ"
-    }
-    "tuple applicative operation" - {
-      (Option(1) tuple Option(2)) ==>
-        Option((1, 2))
-      (List(1, 2) tuple List(3, 4)) ==>
-        List((1, 3), (1, 4), (2, 3), (2, 4))
-    }
+    val cartesianThree = (xs |@| xs |@| xs)(_ |+| _ |+| _)
+
+    cartesianThree.size shouldBe
+      26 * 26 * 26
+
+    cartesianThree.head shouldBe
+      "AAA"
+
+    cartesianThree(26 * 26 * 26 - 1) shouldBe
+      "ZZZ"
+  }
+
+  it should "tuple applicative operation" in {
+    (Option(1) tuple Option(2)) shouldBe
+      Option((1, 2))
+    (List(1, 2) tuple List(3, 4)) shouldBe
+      List((1, 3), (1, 4), (2, 3), (2, 4))
   }
 }

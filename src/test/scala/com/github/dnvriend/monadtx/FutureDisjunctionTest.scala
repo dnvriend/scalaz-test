@@ -32,33 +32,31 @@
 //
 //package com.github.dnvriend.monadtx
 //
-//import com.github.dnvriend.PimpedFuture
+//import com.github.dnvriend.TestSpec
 //
 //import scala.concurrent.Future
 //import scalaz.EitherT._
-//import scalaz.Scalaz._
 //import scalaz._
-//import utest._
 //
-//object FutureDisjunctionTest extends TestSuite {
-//  val tests = this{
-//    "compose AB that are disjunctions" - {
-//      def fea: Future[String \/ Int] = Future.successful(\/-(1))
-//      def feb(a: Int): Future[String \/ Int] = Future.successful(\/-(a + 2))
+//class FutureDisjunctionTest extends TestSpec {
 //
-//      val composedAB: Future[String \/ Int] = (for {
-//        a ← eitherT(fea)
-//        ab ← eitherT(feb(a))
-//      } yield ab).run
+//  it should "compose AB that are disjunctions" in {
+//    def fea: Future[String \/ Int] = Future.successful(\/-(1))
+//    def feb(a: Int): Future[String \/ Int] = Future.successful(\/-(a + 2))
 //
-//      //      assertMatch(composedAB.futureValue) {
-//      //        case \/-(2) ⇒
-//      //      }
-//    }
+//    val composedAB: Future[String \/ Int] = (for {
+//      a ← eitherT(fea)
+//      ab ← eitherT(feb(a))
+//    } yield ab).run
 //
-//    //
-//    //    composedAB.map(_.toEither).futureValue should matchPattern {
-//    //      case Right(3) ⇒
-//    //    }
+//    //      assertMatch(composedAB.futureValue) {
+//    //        case \/-(2) ⇒
+//    //      }
 //  }
+//
+//  //
+//  //    composedAB.map(_.toEither).futureValue should matchPattern {
+//  //      case Right(3) ⇒
+//  //    }
+//
 //}

@@ -16,88 +16,95 @@
 
 package com.github.dnvriend.disjunction
 
-import utest._
+import com.github.dnvriend.TestSpec
 
 import scalaz._
 import Scalaz._
 
-object DisjunctionTest extends TestSuite {
-  val tests = this{
-    "Disjunction (a scalaz Either) has methods to create the right/left projection of a disjunction" - {
-      "Success!".right ==>
-        \/-("Success!")
+class DisjunctionTest extends TestSpec {
 
-      "Failure!".left ==>
-        -\/("Failure!")
-    }
-    "The Disjunction Singletion also has the right and left methods" - {
-      \/.right("Success!") ==>
-        \/-("Success!")
+  it should "Disjunction (a scalaz Either) has methods to create the right/left projection of a disjunction" in {
+    "Success!".right shouldBe
+      \/-("Success!")
 
-      \/.left("Failure!") ==>
-        -\/("Failure!")
-    }
-    "Fully Symbolic" - {
-      \/-("Success!") ==>
-        \/-("Success!")
-
-      -\/("Failure!") ==>
-        -\/("Failure!")
-    }
-    "Converting Option to Disjunction" - {
-      None.toRightDisjunction("No object found") ==>
-        -\/("No object found")
-
-      None \/> "No object found" ==>
-        -\/("No object found")
-
-      Some("My hovercraft is full of eels") \/> "No object found" ==>
-        \/-("My hovercraft is full of eels")
-
-      Some("My hovercraft is full of eels").toRightDisjunction("No object found") ==>
-        \/-("My hovercraft is full of eels")
-    }
-    "Converting Disjunction to Option" - {
-      \/-(1).toOption ==>
-        1.some
-
-      -\/("Book not found").toOption ==>
-        None
-    }
-    "Disjunctions are monads, they are right associated so they fail with the first left, and return only that error message" - {
-      (for {
-        numOfBooks ← Option(10) \/> "Book not in inventory"
-        prize ← Option(22.00) \/> "Book not in prize definition"
-      } yield numOfBooks * prize) ==> \/-(220.00)
-
-      (for {
-        numOfBooks ← none[Int] \/> "Book not in inventory"
-        prize ← Option(22.00) \/> "Book not in prize definition"
-      } yield numOfBooks * prize) ==> -\/("Book not in inventory")
-
-      (for {
-        numOfBooks ← Option(10) \/> "Book not in inventory"
-        prize ← none[Double] \/> "Book not in prize definition"
-      } yield numOfBooks * prize) ==> -\/("Book not in prize definition")
-    }
-    "Converting Disjunction to Validation" - {
-      \/-("Success!").validationNel[String] ==>
-        Success("Success!")
-
-      -\/("Failure!").validationNel[String] ==>
-        Failure(NonEmptyList("Failure!"))
-    }
-    "Converted Validations can be folded" - {
-      NonEmptyList(
-        \/-("Success 1").validationNel[String],
-        \/-("Success 2").validationNel[String],
-        -\/("Failure 1").validationNel[String],
-        -\/("Failure 2").validationNel[String],
-        \/-("Success 3").validationNel[String],
-        \/-("Success 4").validationNel[String]
-      ).foldLeft(List.empty[String].successNel[String]) {
-        case (acc, v) ⇒ (acc |@| v)(_ :+ _)
-      } ==> Failure(NonEmptyList("Failure 1", "Failure 2"))
-    }
+    "Failure!".left shouldBe
+      -\/("Failure!")
   }
+
+  it should "The Disjunction Singletion also has the right and left methods" in {
+    \/.right("Success!") shouldBe
+      \/-("Success!")
+
+    \/.left("Failure!") shouldBe
+      -\/("Failure!")
+  }
+
+  it should "Fully Symbolic" in {
+    \/-("Success!") shouldBe
+      \/-("Success!")
+
+    -\/("Failure!") shouldBe
+      -\/("Failure!")
+  }
+
+  it should "Converting Option to Disjunction" in {
+    None.toRightDisjunction("No object found") shouldBe
+      -\/("No object found")
+
+    None \/> "No object found" shouldBe
+      -\/("No object found")
+
+    Some("My hovercraft is full of eels") \/> "No object found" shouldBe
+      \/-("My hovercraft is full of eels")
+
+    Some("My hovercraft is full of eels").toRightDisjunction("No object found") shouldBe
+      \/-("My hovercraft is full of eels")
+  }
+
+  it should "Converting Disjunction to Option" in {
+    \/-(1).toOption shouldBe
+      1.some
+
+    -\/("Book not found").toOption shouldBe
+      None
+  }
+
+  it should "Disjunctions are monads, they are right associated so they fail with the first left, and return only that error message" in {
+    (for {
+      numOfBooks ← Option(10) \/> "Book not in inventory"
+      prize ← Option(22.00) \/> "Book not in prize definition"
+    } yield numOfBooks * prize) shouldBe \/-(220.00)
+
+    (for {
+      numOfBooks ← none[Int] \/> "Book not in inventory"
+      prize ← Option(22.00) \/> "Book not in prize definition"
+    } yield numOfBooks * prize) shouldBe -\/("Book not in inventory")
+
+    (for {
+      numOfBooks ← Option(10) \/> "Book not in inventory"
+      prize ← none[Double] \/> "Book not in prize definition"
+    } yield numOfBooks * prize) shouldBe -\/("Book not in prize definition")
+  }
+
+  it should "Converting Disjunction to Validation" in {
+    \/-("Success!").validationNel[String] shouldBe
+      Success("Success!")
+
+    -\/("Failure!").validationNel[String] shouldBe
+      Failure(NonEmptyList("Failure!"))
+  }
+
+  it should "Converted Validations can be folded" in {
+    NonEmptyList(
+      \/-("Success 1").validationNel[String],
+      \/-("Success 2").validationNel[String],
+      -\/("Failure 1").validationNel[String],
+      -\/("Failure 2").validationNel[String],
+      \/-("Success 3").validationNel[String],
+      \/-("Success 4").validationNel[String]
+    ).foldLeft(List.empty[String].successNel[String]) {
+      case (acc, v) ⇒ (acc |@| v)(_ :+ _)
+    } shouldBe Failure(NonEmptyList("Failure 1", "Failure 2"))
+  }
+
 }

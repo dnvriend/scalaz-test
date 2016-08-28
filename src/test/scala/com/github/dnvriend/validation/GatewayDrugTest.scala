@@ -16,11 +16,13 @@
 
 package com.github.dnvriend.validation
 
-import utest._
+import com.github.dnvriend.TestSpec
 
-import scalaz._, Scalaz._
+import scalaz.Scalaz._
+import scalaz._
 
-object GatewayDrugTest extends TestSuite {
+class GatewayDrugTest extends TestSpec {
+
   final case class Foo(a: Int, b: Char, c: String)
 
   type ErrorsOr[A] = ValidationNel[String, A]
@@ -43,21 +45,19 @@ object GatewayDrugTest extends TestSuite {
   def validateFoo(a: String, b: String, c: String) =
     (checkA(a) |@| checkB(b) |@| checkC(c))(Foo.apply)
 
-  val tests = this{
-    // see: http://meta.plasm.us/posts/2013/06/05/applicative-validation-syntax/
+  // see: http://meta.plasm.us/posts/2013/06/05/applicative-validation-syntax/
 
-    // Applicative validation
-    // draw clearer lines between data models and validation logic
+  // Applicative validation
+  // draw clearer lines between data models and validation logic
 
-    "validateFoo" - {
-      validateFoo("ab", "cd", "ef") ==>
-        Failure(NonEmptyList("Not a number!", "Not a lower case letter!", "Wrong size!"))
+  it should "validateFoo" in {
+    validateFoo("ab", "cd", "ef") shouldBe
+      Failure(NonEmptyList("Not a number!", "Not a lower case letter!", "Wrong size!"))
 
-      validateFoo("42", "cd", "ef") ==>
-        Failure(NonEmptyList("Not a lower case letter!", "Wrong size!"))
+    validateFoo("42", "cd", "ef") shouldBe
+      Failure(NonEmptyList("Not a lower case letter!", "Wrong size!"))
 
-      validateFoo("42", "x", "what") ==>
-        Success(Foo(42, 'x', "what"))
-    }
+    validateFoo("42", "x", "what") shouldBe
+      Success(Foo(42, 'x', "what"))
   }
 }

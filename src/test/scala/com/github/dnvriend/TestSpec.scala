@@ -16,13 +16,14 @@
 
 package com.github.dnvriend
 
-import scala.concurrent.duration.{ FiniteDuration, _ }
-import scala.concurrent.{ Await, Future }
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{ FlatSpec, Matchers }
 
-trait PimpedFuture {
-  implicit class PimpedFuture[A](val future: Future[A])(implicit timeout: FiniteDuration = 1.second) {
-    def futureValue: A = Await.result[A](future, timeout)
-  }
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+
+abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures {
+  implicit def SymbolToString(sym: Symbol): String = sym.toString()
+  implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val pc: PatienceConfig = PatienceConfig(timeout = 5.minutes)
 }
-
-object PimpedFuture extends PimpedFuture
