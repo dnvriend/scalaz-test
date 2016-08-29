@@ -112,7 +112,7 @@ Semigroup[Int].append(1,2) == 3
 - [The Typeclassopedia by John Kodumal](http://typeclassopedia.bitbucket.org/)
 - [Semigroup by Von Markus Klink](https://inoio.de/blog/2014/07/19/type-class-101-semigroup/)
 - [John Kurkowskiux - Accumulating More Than One Failure In A ValidationNEL](http://johnkurkowski.com/posts/accumulating-multiple-failures-in-a-ValidationNEL/)
-
+- [Yann Moisan - Scalaz from the trenches](http://www.yannmoisan.com/scalaz.html)
 ## Videos
 - [Learning Scalaz by Eugene Yokota](https://www.youtube.com/watch?v=jyMIvcUxOJ0)
 - [Scalaz 102 Level Up Your Scalaz Foo by Colt Frederickson](https://www.youtube.com/watch?v=O5QwVqdkVtY)

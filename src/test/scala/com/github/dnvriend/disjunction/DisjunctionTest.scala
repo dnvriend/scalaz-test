@@ -86,6 +86,21 @@ class DisjunctionTest extends TestSpec {
     } yield numOfBooks * prize) shouldBe -\/("Book not in prize definition")
   }
 
+  it should "construct disjunction from a code block that throws" in {
+    val ex: RuntimeException = new RuntimeException("foo")
+    \/.fromTryCatchNonFatal {
+      throw ex
+    } shouldBe -\/(ex)
+  }
+
+  it should "append failure side" in {
+    \/.left[String, String]("foo") |+| \/.left[String, String]("bar") shouldBe \/.left("foobar")
+  }
+
+  it should "append success side" in {
+    \/.right[String, String]("foo") |+| \/.right[String, String]("bar") shouldBe \/.right("foobar")
+  }
+
   it should "Converting Disjunction to Validation" in {
     \/-("Success!").validationNel[String] shouldBe
       Success("Success!")
