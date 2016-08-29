@@ -18,6 +18,7 @@ package com.github.dnvriend.validation
 
 import com.github.dnvriend.TestSpec
 
+import scala.concurrent.Future
 import scalaz.Scalaz._
 import scalaz._
 
@@ -59,5 +60,20 @@ class GatewayDrugTest extends TestSpec {
 
     validateFoo("42", "x", "what") shouldBe
       Success(Foo(42, 'x', "what"))
+  }
+
+  it should "transform either using EitherT" in {
+    def getInt: Future[String \/ Int] = Future.successful(\/.right(2))
+    def getLong(x: Int): Future[String \/ Long] = Future.successful(\/.right(2 * 4L))
+
+    // we should use the EitherT transformer
+    val compositionF: Future[String \/ Long] = (for {
+      x <- EitherT(getInt)
+      y <- EitherT(getLong(x))
+    } yield y).run
+
+    val result = compositionF.futureValue
+    result shouldBe \/-(8L)
+    result.validation shouldBe Success(8)
   }
 }

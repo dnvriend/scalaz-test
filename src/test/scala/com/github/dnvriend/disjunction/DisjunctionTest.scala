@@ -94,7 +94,7 @@ class DisjunctionTest extends TestSpec {
       Failure(NonEmptyList("Failure!"))
   }
 
-  it should "Converted Validations can be folded" in {
+  it should "Converted Validations can be folded failure case" in {
     NonEmptyList(
       \/-("Success 1").validationNel[String],
       \/-("Success 2").validationNel[String],
@@ -105,6 +105,17 @@ class DisjunctionTest extends TestSpec {
     ).foldLeft(List.empty[String].successNel[String]) {
       case (acc, v) ⇒ (acc |@| v)(_ :+ _)
     } shouldBe Failure(NonEmptyList("Failure 1", "Failure 2"))
+  }
+
+  it should "Converted Validations can be folded success case" in {
+    NonEmptyList(
+      \/-("Success 1").validationNel[String],
+      \/-("Success 2").validationNel[String],
+      \/-("Success 3").validationNel[String],
+      \/-("Success 4").validationNel[String]
+    ).foldLeft(List.empty[String].successNel[String]) {
+      case (acc, v) ⇒ (acc |@| v)(_ :+ _)
+    } shouldBe Success(List("Success 1", "Success 2", "Success 3", "Success 4"))
   }
 
 }

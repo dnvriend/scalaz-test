@@ -83,8 +83,50 @@ class ValidationTest extends TestSpec {
       Failure(NonEmptyList("/ by zero"))
   }
 
+  it should "validate case class success flow" in {
+    case class Foo(x: String)
+    Foo("x").successNel[String] *>
+      Foo("y").successNel[String] *>
+      Foo("z").successNel[String] shouldBe Success(Foo("z"))
+  }
+
+  it should "validate case class failure flow" in {
+    case class Foo(x: String)
+    Foo("x").successNel[String] *>
+      "wtf".failureNel *>
+      Foo("z").successNel[String] *>
+      "rtfm".failureNel shouldBe Failure(NonEmptyList("wtf", "rtfm"))
+  }
+
+  it should "fold a list of validation case classes failure flow" in {
+    case class Foo(x: String)
+    NonEmptyList(
+      Foo("x").successNel[String],
+      "wtf".failureNel,
+      Foo("z").successNel[String],
+      "rtfm".failureNel
+    ).foldLeft(Foo("x").successNel[String]) {
+      case (acc, v) => acc *> v
+    } shouldBe Failure(NonEmptyList("wtf", "rtfm"))
+  }
+
+  it should "fold a list of validation case classes success flow" in {
+    case class Foo(x: String)
+    NonEmptyList(
+      Foo("x").successNel[String],
+      Foo("y").successNel[String],
+      Foo("z").successNel[String]
+    ).foldLeft(Foo("x").successNel[String]) {
+      case (acc, v) => acc *> v
+    } shouldBe Success(Foo("z"))
+  }
+
   it should 'FoldingListOfFailures in {
-    NonEmptyList("failure a".failureNel[String], "failure b".failureNel[String], "failure c".failureNel[String]).foldLeft(List.empty[String].successNel[String]) {
+    NonEmptyList(
+      "failure a".failureNel[String],
+      "failure b".failureNel[String],
+      "failure c".failureNel[String]
+    ).foldLeft(List.empty[String].successNel[String]) {
       case (acc, v) ⇒ (acc |@| v)(_ :+ _)
     } shouldBe Failure(NonEmptyList("failure a", "failure b", "failure c"))
   }
