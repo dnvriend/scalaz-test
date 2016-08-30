@@ -36,7 +36,6 @@ When studying the source code you will see some symbols, below is a legend:
  
 Symbol | Description
 ------ | -----------
-==> | comes from [uTest](https://github.com/lihaoyi/utest) and is an 'Arrow Assert'. Arrow assert is a nice syntax for asserting things are equal. `a ==> b` is a shorthand for `assert(a == b)`
 [\|+\|][semigrouptest] | comes from [SemigroupSyntax][semigroup-syntax] and is an 'append' operation. The `|+|` is a nice syntax for an associative binary operation
 [<*>][applicativetest] | comes from [ApplySyntax][apply-syntax] and is a symbol for applying a functor containing a function and applying it on a functor containing a value, extracts the function of the first functor, and then maps it over the functor containing the value, returning the functor containing the new value  
 [^][applicativetest] | comes from [ApplySyntax][apply-syntax] and is a symbol for extracts values from containers and apply them to a single function
@@ -103,21 +102,26 @@ Semigroup[Int].append(1,2) == 3
 
 # Learning Resources
 
-## GitHub
-- [SimpleZ](https://github.com/inoio/simplez)
-
 ## Blogs
+- [Twitter - Effective Scala](http://twitter.github.io/effectivescala/)
 - [Scala: Types of a higher kind by Jed Wesley-Smith](http://blogs.atlassian.com/2013/09/scala-types-of-a-higher-kind/)
 - [Learning Scalaz by Eugene Yokota](http://eed3si9n.com/learning-scalaz/)
 - [The Typeclassopedia by John Kodumal](http://typeclassopedia.bitbucket.org/)
 - [Semigroup by Von Markus Klink](https://inoio.de/blog/2014/07/19/type-class-101-semigroup/)
 - [John Kurkowskiux - Accumulating More Than One Failure In A ValidationNEL](http://johnkurkowski.com/posts/accumulating-multiple-failures-in-a-ValidationNEL/)
 - [Yann Moisan - Scalaz from the trenches](http://www.yannmoisan.com/scalaz.html)
+- [Mavilein - Error Handling: Comparing Scala's Try with Scalaz's Either/Disjunction](http://mavilein.github.io/scala/2015/09/01/comparing-error-handling-scalas-try-with-scalazs-either-disjunction/)
+
 ## Videos
 - [Learning Scalaz by Eugene Yokota](https://www.youtube.com/watch?v=jyMIvcUxOJ0)
 - [Scalaz 102 Level Up Your Scalaz Foo by Colt Frederickson](https://www.youtube.com/watch?v=O5QwVqdkVtY)
 - [Bill Venners - Comparing Functional Error Handling in Scalaz and Scalactic](https://www.youtube.com/watch?v=2kFigGFqML0)
 - [Type classes in Scala by Dan Rosen][type classes in scala with dan rosen]
+
+
+## Other projects on GitHub
+- [Channing Walton - My tinkering to understand the typeclassopedia](https://github.com/channingwalton/typeclassopedia)
+- [Inoio - SimpleZ](https://github.com/inoio/simplez)
 
 ---
 

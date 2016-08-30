@@ -86,11 +86,26 @@ class DisjunctionTest extends TestSpec {
     } yield numOfBooks * prize) shouldBe -\/("Book not in prize definition")
   }
 
-  it should "construct disjunction from a code block that throws" in {
+  it should "construct disjunction from a code block that throws nonfatal" in {
     val ex: RuntimeException = new RuntimeException("foo")
     \/.fromTryCatchNonFatal {
       throw ex
     } shouldBe -\/(ex)
+  }
+
+  it should "construct disjunction from a code block that throws" in {
+    val ex: RuntimeException = new RuntimeException("foo")
+    \/.fromTryCatchThrowable[String, RuntimeException] {
+      throw ex
+    } shouldBe -\/(ex)
+  }
+
+  it should "construct a disjunction from a scala.util.Try success case" in {
+    scala.util.Try(1).toDisjunction shouldBe \/-(1)
+  }
+
+  it should "construct a disjunction from a scala.util.Try failure case" in {
+    scala.util.Try(1 / 0).toDisjunction should matchPattern { case -\/(_) => }
   }
 
   it should "append failure side" in {

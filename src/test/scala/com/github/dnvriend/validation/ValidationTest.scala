@@ -21,6 +21,10 @@ import com.github.dnvriend.TestSpec
 import scalaz._
 import Scalaz._
 
+object ValidationTest {
+  final case class Foo(x: Int, y: Int, z: Int)
+}
+
 class ValidationTest extends TestSpec {
   // see: http://eed3si9n.com/learning-scalaz/Validation.html
   // see: http://www.47deg.com/blog/fp-for-the-average-joe-part-1-scalaz-validation
@@ -81,6 +85,16 @@ class ValidationTest extends TestSpec {
     (Validation.fromTryCatchNonFatal[Int](1 / 0).leftMap(t ⇒ t.getMessage).toValidationNel[String, Int] *>
       Validation.fromTryCatchNonFatal[Int](1).leftMap(t ⇒ t.getMessage).toValidationNel[String, Int]) shouldBe
       Failure(NonEmptyList("/ by zero"))
+  }
+
+  it should "construct a validation from a scala.util.Try success path" in {
+    scala.util.Try(1).toValidationNel shouldBe Success(1)
+  }
+
+  it should "construct a validation from a scala.util.Try failure path" in {
+    val err: Throwable = new RuntimeException("foo")
+    scala.util.Try(throw err).toValidationNel *> scala.util.Try(throw err).toValidationNel shouldBe
+      Failure(NonEmptyList(err, err))
   }
 
   it should "validate case class success flow" in {
@@ -159,6 +173,20 @@ class ValidationTest extends TestSpec {
       case Failure(xs) ⇒ xs.toList.mkString(",")
       case _           ⇒ ""
     }) shouldBe "iban is empty,payment account id is invalid, should be > 0"
+  }
+
+  it should "apply the applicative builder for the happy path" in {
+    (1.successNel[String] |@| 2.successNel[String] |@| 3.successNel[String]) { (x: Int, y: Int, z: Int) =>
+      println(s"Should be called only once with x=$x and y=$y and z=$z")
+    }
+  }
+
+  it should "create case classes from the result of the applicative builder success path" in {
+    (1.successNel[String] |@| 2.successNel[String] |@| 3.successNel[String])(ValidationTest.Foo.apply) shouldBe Success(ValidationTest.Foo(1, 2, 3))
+  }
+
+  it should "create case classes from the result of the applicative builder failure path" in {
+    ("foo".failureNel[Int] |@| "bar".failureNel[Int] |@| 3.successNel[String])(ValidationTest.Foo.apply) shouldBe Failure(NonEmptyList("foo", "bar"))
   }
 
   it should "lifting functions into an applicative function using '|@|'" in {
