@@ -97,6 +97,10 @@ class ValidationTest extends TestSpec {
       Failure(NonEmptyList(err, err))
   }
 
+  it should "validation should accumulate errors on the left side and create a disjunction containing all errors on the left side" in {
+    ("err1".failureNel[Unit] *> "err2".failureNel[Unit] *> "err3".failureNel[Unit]).disjunction shouldBe -\/(NonEmptyList("err1", "err2", "err3"))
+  }
+
   it should "validate case class success flow" in {
     case class Foo(x: String)
     Foo("x").successNel[String] *>
