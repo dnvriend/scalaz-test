@@ -19,11 +19,16 @@ package com.github.dnvriend
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{ FlatSpec, Matchers }
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
+import scala.util.Try
 
 abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit def SymbolToString(sym: Symbol): String = sym.toString()
   implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
   implicit val pc: PatienceConfig = PatienceConfig(timeout = 5.minutes)
+
+  implicit class PimpedFuture[T](self: Future[T]) {
+    def toTry: Try[T] = Try(self.futureValue)
+  }
 }

@@ -139,6 +139,24 @@ class ValidationTest extends TestSpec {
     } shouldBe Success(Foo("z"))
   }
 
+  it should "validate tree of errors" in {
+    trait MyFailure
+    case class ErrorOne(msg: String) extends MyFailure
+    case class ErrorTwo(msg: String) extends MyFailure
+    def errorOne(msg: String): MyFailure = ErrorOne(msg)
+    def errorTwo(msg: String): MyFailure = ErrorTwo(msg)
+
+    trait MySuccess
+    case class SuccessOne(msg: String) extends MySuccess
+    case class SuccessTwo(msg: String) extends MySuccess
+
+    Validation.failureNel[MyFailure, MySuccess](ErrorOne("foo")) *> Validation.failureNel(ErrorTwo("bar")) shouldBe Failure(NonEmptyList(ErrorOne("foo"), ErrorTwo("bar")))
+
+    errorOne("foo").failureNel[MySuccess] *> errorTwo("bar").failureNel[MySuccess] shouldBe Failure(NonEmptyList(ErrorOne("foo"), ErrorTwo("bar")))
+
+    SuccessOne("foo").successNel[MyFailure] *> SuccessTwo("bar").successNel[MyFailure] shouldBe Success(SuccessTwo("bar"))
+  }
+
   it should 'FoldingListOfFailures in {
     NonEmptyList(
       "failure a".failureNel[String],

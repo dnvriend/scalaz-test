@@ -20,6 +20,7 @@ import com.github.dnvriend.TestSpec
 
 import scalaz._
 import Scalaz._
+import scala.concurrent.Future
 
 class DisjunctionTest extends TestSpec {
 
@@ -148,4 +149,16 @@ class DisjunctionTest extends TestSpec {
     } shouldBe Success(List("Success 1", "Success 2", "Success 3", "Success 4"))
   }
 
+  it should "map a left side of the disjunction to a type" in {
+    val x: Future[String \/ Int] = Future.successful(1.right[String])
+    x.flatMap {
+      case \/-(right) => Future.successful(right)
+      case -\/(left)  => Future.failed(new RuntimeException(left))
+    }.futureValue shouldBe 1
+
+    Future.successful("foo".left[Unit]).flatMap {
+      case \/-(right) => Future.successful(right)
+      case -\/(left)  => Future.failed(new RuntimeException(left))
+    }.toTry should be a 'failure
+  }
 }
