@@ -29,9 +29,11 @@ class ApplicativeTest extends TestSpec {
 
   // let's build up to Applicatives
   it should 'TheProblem in {
-    val functionThatTakesTwoParameters: (Int, Int) ⇒ Int = (_: Int) * (_: Int)
+    def methodThatTakesTwoParameters(x: Int, y: Int) = x * y
+    val f2: Function2[Int, Int, Int] = methodThatTakesTwoParameters _ // (Int, Int) => Int
+    val functionThatTakesTwoParameters: (Int, Int) => Int = (_: Int) * (_: Int)
     // notice that we have a function with 2 parameters, we cannot use that let's curry it:
-    val curriedFunction: Int ⇒ Int ⇒ Int = functionThatTakesTwoParameters.curried
+    val curriedFunction: Int => Int => Int = functionThatTakesTwoParameters.curried
     // notice, the function looks more how Haskell defines functions that take multiple parameters
     // we can now apply the values 1, 2, 3 to the curried function; it will return a function Int => Int
     val functionsInContext: List[Int ⇒ Int] = List(1, 2, 3) map curriedFunction
@@ -64,7 +66,7 @@ class ApplicativeTest extends TestSpec {
     //    2. and then maps it over the second one
 
     // legend:
-    // <* returns the lhs
+    // <* returns the lhs (left-hand-side)
     (None <* None) shouldBe
       None
 
@@ -82,7 +84,7 @@ class ApplicativeTest extends TestSpec {
       1.some
 
     // legend:
-    // *> returns the rhs
+    // *> returns the rhs (right-hand-side)
     (None *> None) shouldBe
       None
 

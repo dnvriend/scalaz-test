@@ -4,14 +4,25 @@ version := "1.0.0"
 
 scalaVersion := "2.11.8"
 
-libraryDependencies ++= Seq(
-    "org.scalaz" %% "scalaz-core" % "7.2.5",
-    "org.scalatest" %% "scalatest" % "3.0.0" % Test
-)
+libraryDependencies ++= {
+  val scalazVersion = "7.2.5"
+  val scalazContribVersion = "0.2"
+  Seq(
+    "org.scalaz" %% "scalaz-core" % scalazVersion,
+  "org.typelevel" %% "scalaz-contrib-210" % scalazContribVersion,
+  "org.typelevel" %% "scalaz-contrib-validation" % scalazContribVersion,
+  "org.typelevel" %% "scalaz-contrib-undo" % scalazContribVersion,
+  // currently unavailable because there's no 2.11 build of Lift yet
+  // "org.typelevel" %% "scalaz-lift"               % "0.2",
+  "org.typelevel" %% "scalaz-nscala-time" % scalazContribVersion,
+  "org.typelevel" %% "scalaz-spire" % scalazContribVersion,
+  "org.scalatest" %% "scalatest" % "3.0.0" % Test
+  )
+}
 
 testFrameworks += new TestFramework("utest.runner.Framework")
 
-licenses +=("Apache-2.0", url("http://opensource.org/licenses/apache2.0.php"))
+licenses += ("Apache-2.0", url("http://opensource.org/licenses/apache2.0.php"))
 
 // enable scala code formatting //
 import scalariform.formatter.preferences._

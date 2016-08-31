@@ -26,7 +26,10 @@ class MonadTest extends TestSpec {
   // A Monad is not required to have any particular "value" or none,
   // only to compose with functions in particular ways.
 
-  // A Monad is a Monoid (in the category of Endofunctors), meaning it's a set with certain operations.
+  // A Monad is a Monoid (in the category of Endofunctors), which means it is-an endofunctor, eg. when you've seen
+  // the following structure Option[Option[A]] or List[List[A]] or Future[Future[A]] etc, this structure is called
+  // an endofunctor. Its also a Monoid which means that it chains results from the first evaluation to the next for
+  // example when used in a for-expression/comprehension or .flatMap/.map combination.
 
   // Elements of things of type 'A => M[B]' (in scalaz this type is called Kleisli).
 

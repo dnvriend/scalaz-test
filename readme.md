@@ -29,7 +29,8 @@ It provides:
   - [Foldable][Foldable]: the ability to extract zero or more values of that type
   - [Traverse][Traverse]: Idiomatic traversal of a structure, as described in [The Essence of the Iterator Pattern][iterator-pattern-pdf]
 
-
+## scalaz-contrib
+[scalaz-contrib](https://github.com/typelevel/scalaz-contrib) is a library that provides interoperability libraries and additional data structures and instances for Scalaz.
 
 ## Legend
 When studying the source code you will see some symbols, below is a legend:
@@ -100,7 +101,7 @@ Semigroup[Int].append(1,2) == 3
 ## Typeclassopedia
 ![typeclassopedia](https://github.com/dnvriend/scalaz-test/blob/master/img/typeclassopedia.png)
 
-# Learning Resources
+## Learning Resources
 
 ## Blogs
 - [Twitter - Effective Scala](http://twitter.github.io/effectivescala/)
@@ -111,6 +112,7 @@ Semigroup[Int].append(1,2) == 3
 - [John Kurkowskiux - Accumulating More Than One Failure In A ValidationNEL](http://johnkurkowski.com/posts/accumulating-multiple-failures-in-a-ValidationNEL/)
 - [Yann Moisan - Scalaz from the trenches](http://www.yannmoisan.com/scalaz.html)
 - [Mavilein - Error Handling: Comparing Scala's Try with Scalaz's Either/Disjunction](http://mavilein.github.io/scala/2015/09/01/comparing-error-handling-scalas-try-with-scalazs-either-disjunction/)
+- [Underscore.io - Scalaz Monad Transformers](http://underscore.io/blog/posts/2013/12/20/scalaz-monad-transformers.html)
 
 ## Videos
 - [Learning Scalaz by Eugene Yokota](https://www.youtube.com/watch?v=jyMIvcUxOJ0)

@@ -24,6 +24,8 @@ import scalaz._
 
 class GatewayDrugTest extends TestSpec {
 
+  // see: http://eed3si9n.com/learning-scalaz/Validation.html
+
   final case class Foo(a: Int, b: Char, c: String)
 
   type ErrorsOr[A] = ValidationNel[String, A]
