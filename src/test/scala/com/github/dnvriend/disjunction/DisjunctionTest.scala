@@ -125,8 +125,15 @@ class DisjunctionTest extends TestSpec {
     List("foo".failureNel[String], "bar".failureNel[String], "baz".successNel[String]).sequenceU shouldBe Failure(NonEmptyList("foo", "bar"))
   }
 
-  it should "sequence a list of ValidationNel result in a single (failed) Validation accumulating all errors converting to a disjunction" in {
+  it should "sequence a list of ValidationNel result in a single (success) Validation accumulating all successes" in {
+    List("foo".successNel[String], "bar".successNel[String], "baz".successNel[String]).sequenceU shouldBe Success(List("foo", "bar", "baz"))
+  }
+  it should "sequence a list of ValidationNel result in a single (failed) Validation accumulating all errors converting to a left-disjunction" in {
     List("foo".failureNel[String], "bar".failureNel[String], "baz".successNel[String]).sequenceU.disjunction shouldBe -\/(NonEmptyList("foo", "bar"))
+  }
+
+  it should "sequence a list of ValidationNel result in a single (success) Validation accumulating all errors converting to a right-disjunction" in {
+    List("foo".successNel[String], "bar".successNel[String], "baz".successNel[String]).sequenceU.disjunction shouldBe \/-(List("foo", "bar", "baz"))
   }
 
   it should "Converting Disjunction to Validation" in {
