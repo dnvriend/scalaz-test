@@ -52,8 +52,11 @@ class MonadTransformerTest extends TestSpec {
     def getRoleForUser(user: User): Future[Option[Role]] =
       (user.id == 3) ? Future.successful(Option.empty[Role]) | Future.successful(Role(user.id, randomRole).some)
 
-    def getPermissionForRole(role: Role): Future[Option[Permission]] =
-      (role.id == 4) ? Future.successful(Option.empty[Permission]) | Future.successful(randomPermission.some)
+    def getPermissionForRole(role: Role): Future[Option[Permission]] = role.id match {
+      case 1 => Future.successful(permissions.headOption)
+      case 4 => Future.successful(Option.empty[Permission])
+      case _ => Future.successful(randomPermission.some)
+    }
   }
 
   def withDao(f: Dao => Unit): Unit =
@@ -79,7 +82,7 @@ class MonadTransformerTest extends TestSpec {
     withDao(dao => f(new Service(dao)))
 
   it should "compose multiple Future[Option[A]] ie. 'stacked monads' in a for-expression using an Option transformer and should be defined" in withService { service =>
-    service.findPermissionForUserId(1).futureValue shouldBe 'defined
+    service.findPermissionForUserId(1).futureValue shouldBe Some(Permission(1, "edit"))
   }
 
   it should "compose stacked Future[Option[A]] in a for-expression using an Option transformer and should not be defined" in withService { service =>
@@ -87,6 +90,7 @@ class MonadTransformerTest extends TestSpec {
   }
 
   it should "compose stacked Future[Disjunction] types, to solve the 'silent-failure' problem that using the Option type introduce" in withService { service =>
+    service.findPermissionForUserIdBetterFeedback(1).futureValue shouldBe \/-(Permission(1, "edit"))
     service.findPermissionForUserIdBetterFeedback(2).futureValue shouldBe -\/("No user found for id: '2'")
     service.findPermissionForUserIdBetterFeedback(3).futureValue shouldBe -\/("No role found for user.id: '3'")
     service.findPermissionForUserIdBetterFeedback(4).futureValue shouldBe -\/("No permission found for role.id: '4'")

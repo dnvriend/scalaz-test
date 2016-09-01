@@ -167,11 +167,21 @@ class ValidationTest extends TestSpec {
     } shouldBe Failure(NonEmptyList("failure a", "failure b", "failure c"))
   }
 
-  it should 'accumulatingValidation in {
+  it should "accumulate validations using traverseU which is map+sequence" in {
     def validate(msg: String): ValidationNel[String, String] = s"failure $msg".failureNel[String]
     val listToValidate = NonEmptyList("a", "b", "c")
     listToValidate.traverseU(validate) shouldBe
       Failure(NonEmptyList("failure a", "failure b", "failure c"))
+  }
+
+  it should "accumulate validations using sequenceU turining a List[ValidationNel[String, A]] into a ValidationNel[String, List[A]] failure case" in {
+    List("failure a".failureNel, "failure b".failureNel, "failure c".failureNel).sequenceU shouldBe
+      Failure(NonEmptyList("failure a", "failure b", "failure c"))
+  }
+
+  it should "accumulate validations using sequenceU turining a List[ValidationNel[String, A]] into a ValidationNel[String, List[A]] success case" in {
+    List("success a".successNel[String], "success b".successNel[String], "success c".successNel[String]).sequenceU shouldBe
+      Success(List("success a", "success b", "success c"))
   }
 
   it should "fromTryCatchNonFatal in for comprehension must be a disjunction as Validation is not a Monad but an Applicative" in {
@@ -249,6 +259,36 @@ class ValidationTest extends TestSpec {
 
     ("Success 1".successNel[String] |+| "Success 2".successNel[String]) shouldBe
       ("Success 1".successNel[String] |@| "Success 2".successNel[String])(_ |+| _)
+  }
+
+  it should "validate a case class" in {
+    object Version {
+      def validateMajor(major: Int): Validation[String, Int] =
+        (major >= 0) ? major.success[String] | "major must be >= 0".failure
+
+      def validateMinor(minor: Int): Validation[String, Int] =
+        (minor >= 0) ? minor.success[String] | "minor must be >= 0".failure
+
+      def validate(major: Int, minor: Int): ValidationNel[String, Version] =
+        (validateMajor(major).toValidationNel |@| validateMinor(minor).toValidationNel)(Version(_, _))
+
+      def validate(version: Version): ValidationNel[String, Version] =
+        validate(version.major, version.minor)
+
+      def create(major: Int, minor: Int): Disjunction[NonEmptyList[String], Version] =
+        validate(major, minor).disjunction
+    }
+    final case class Version(major: Int, minor: Int)
+
+    // lets create a Version the normal way
+    val x = Version(1, 2)
+    x shouldBe Version(1, 2)
+    Version.validate(x) shouldBe Success(x)
+
+    // lets create an invalid version
+    val y = Version(-1, -1)
+    y shouldBe Version(-1, -1)
+    Version.validate(y) shouldBe Failure(NonEmptyList("major must be >= 0", "minor must be >= 0"))
   }
 }
 
