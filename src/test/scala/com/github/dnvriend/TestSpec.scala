@@ -22,6 +22,7 @@ import org.scalatest.{ FlatSpec, Matchers }
 import scala.concurrent.{ ExecutionContext, Future }
 import scala.concurrent.duration._
 import scala.util.Try
+import scalaz.{ NonEmptyList, _ }
 
 abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures {
   implicit def SymbolToString(sym: Symbol): String = sym.toString()
@@ -30,5 +31,16 @@ abstract class TestSpec extends FlatSpec with Matchers with ScalaFutures {
 
   implicit class PimpedFuture[T](self: Future[T]) {
     def toTry: Try[T] = Try(self.futureValue)
+  }
+
+  type DisjunctionNel[A, +B] = Disjunction[NonEmptyList[A], B]
+
+  implicit class StringOps(val str: String) {
+    def toNel: NonEmptyList[String] = NonEmptyList(str)
+    def leftNel[A]: DisjunctionNel[String, A] = Disjunction.left[NonEmptyList[String], A](str.toNel)
+  }
+
+  implicit class EitherOps[A](val self: A) {
+    def rightNel: DisjunctionNel[String, A] = Disjunction.right[NonEmptyList[String], A](self)
   }
 }

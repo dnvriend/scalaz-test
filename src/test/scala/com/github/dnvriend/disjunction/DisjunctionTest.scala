@@ -180,4 +180,56 @@ class DisjunctionTest extends TestSpec {
       case -\/(left)  => Future.failed(new RuntimeException(left))
     }.toTry should be a 'failure
   }
+
+  "Disjunctions without symbols" should "be created for the left case" in {
+    Disjunction.left[NonEmptyList[String], String](NonEmptyList("foo")) shouldBe NonEmptyList("foo").left
+  }
+
+  it should "be created for the right case" in {
+    Disjunction.right[NonEmptyList[String], String]("foo") shouldBe "foo".right
+  }
+
+  "DisjunctionNel" should "be created" in {
+    // note: DisjunctionNel is *NOT* part of Scalaz, strange as a Disjunction[NonEmptyList[String], A] is a very
+    // common pattern when working with validation ie. "".failureNel.disjunction would create one..
+    // The TestSpec.scala contains a type alias called DisjunctionNel
+
+    // Also, TestSpec.scala contains two implicit conversions to create .leftNel and .rightNel DisjunctionNel types
+    // just like the .left/.right methods
+
+    "foo".leftNel[String] shouldBe a[DisjunctionNel[String, String]]
+    "foo".leftNel[String] shouldBe NonEmptyList("foo").left
+    "foo".rightNel shouldBe "foo".right
+  }
+
+  it should "be used on methods" in {
+    // note: .toNel on String is *NOT* part of Scalaz, it is provided by an extension method
+    // in TestSpec.scala. Sometimes it is convenient to convert a String to NonEmptyList by means
+    // of an extension method to make it compatible with the DisjunctionNel[String, A] pattern.
+    def strToInt(number: String): DisjunctionNel[String, Int] =
+      Disjunction.fromTryCatchNonFatal(number.toInt)
+        .leftMap(cause => s"Error while converting '$number' to Int".toNel)
+
+    // lets convert some 'numbers', or are they?
+    List("aa", "bb")
+      .map(strToInt) // get the disjunction
+      .traverseU(_.validation) // convert to a List[ValidationNel[String, Int]] with map/sequence combo called 'traverseU'
+      .disjunction shouldBe // convert to disjunction
+      NonEmptyList("Error while converting 'aa' to Int", "Error while converting 'bb' to Int").left
+  }
+
+  // of course using Validation as return type for a validation is better
+
+  "Validation to validate" should "be used on methods" in {
+    def strToLong(number: String): ValidationNel[String, Long] =
+      Disjunction.fromTryCatchNonFatal(number.toLong)
+        .leftMap(cause => s"Error while converting '$number' to Long".toNel)
+        .validation
+
+    // lets convert some 'numbers', or are they?
+    List("aa", "bb")
+      .traverseU(strToLong) // convert to a List[ValidationNel[String, Long]] with map/sequence combo called 'traverseU'
+      .disjunction shouldBe // convert to disjunction
+      NonEmptyList("Error while converting 'aa' to Long", "Error while converting 'bb' to Long").left
+  }
 }
