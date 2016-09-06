@@ -119,7 +119,7 @@ Semigroup[Int].append(1,2) == 3
 - [Scalaz 102 Level Up Your Scalaz Foo by Colt Frederickson](https://www.youtube.com/watch?v=O5QwVqdkVtY)
 - [Bill Venners - Comparing Functional Error Handling in Scalaz and Scalactic](https://www.youtube.com/watch?v=2kFigGFqML0)
 - [Type classes in Scala by Dan Rosen][type classes in scala with dan rosen]
-
+- [Oliver Daff - Functor, Apply, Applicative, Bind and Monad (or How to explain FP with the help of Mario and Luigi)](https://www.youtube.com/watch?v=3Ycp55QEbGM)
 
 ## Other projects on GitHub
 - [Channing Walton - My tinkering to understand the typeclassopedia](https://github.com/channingwalton/typeclassopedia)

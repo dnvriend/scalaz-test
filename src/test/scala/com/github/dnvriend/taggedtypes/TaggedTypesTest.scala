@@ -37,8 +37,8 @@ class TaggedTypesTest extends TestSpec {
   def kiloGramToValue(mass: Double @@ KiloGram): Double @@ KiloGram = mass
 
   it should "create a new tagged type using the method 'Kilogram'" in {
-    val mass: Int @@ KiloGram = KiloGram(20)
-    2 * Tag.unwrap(mass) shouldBe 40
+    val mass: Double @@ KiloGram = KiloGram(20.0)
+    2 * Tag.unwrap(mass) shouldBe 40.0
     kiloGramToValue(KiloGram(20.0)) shouldBe 20.0
   }
 
