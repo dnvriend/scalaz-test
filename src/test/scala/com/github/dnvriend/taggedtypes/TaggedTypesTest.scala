@@ -17,45 +17,40 @@
 package com.github.dnvriend.taggedtypes
 
 import com.github.dnvriend.TestSpec
-import com.github.dnvriend.taggedtypes.TaggedTypesTest.{ AirDeliveryCost, Kilogram, PrizePerKilogram }
 
-object TaggedTypesTest {
-  // a value class may not be a member of another class
-  class Kilogram(val x: Double) extends AnyVal
-  class PrizePerKilogram(val x: Double) extends AnyVal
-  class AirDeliveryCost(val x: Double) extends AnyVal
-}
+import scalaz._
+import Scalaz._
 
-// http://docs.scala-lang.org/overviews/core/value-classes.html
-// https://groups.google.com/forum/#!topic/scalaz/Py_IIfp9d2Q
-// https://issues.scala-lang.org/browse/SI-5183
-// https://issues.scala-lang.org/browse/SI-7088
-// https://github.com/scalaz/scalaz/issues/338
 class TaggedTypesTest extends TestSpec {
-  //
-  // see http://docs.scala-lang.org/overviews/core/value-classes.html
-  //
-  // Lets first look at the normal Scala Value Classes (SIP-15) and see what they bring to the table
-  //
-
+  // see: http://eed3si9n.com/learning-scalaz/Tagged+type.html
+  // see: http://etorreborre.blogspot.nl/2011/11/practical-uses-for-unboxed-tagged-types.html
+  // see: http://timperrett.com/2012/06/15/unboxed-new-types-within-scalaz7/
   /**
-   * Value classes are a mechanism in Scala to avoid allocating runtime objects. This is
-   * acomplished by the definition of a new `AnyVal` subclass.
+   * Tagged Types in Scalaz
    *
-   * The value class (TaggedTypeTest.Kilogram) has a single, public val parameter that is the underlying runtime representation.
-   * The type at compile time is `Kilogram`, but at runtime, the representation is an Double, which has the advantage when used
-   * on methods, where a single Double should mean something like `Kilogram`
+   * When looking at value classes or case classes for that matter, the values are wrapped and to get to those values you'll
+   * have to call the public accessor method of that value, which is no fun... well, Scalaz Tagged Types to the rescue!
    */
 
-  def calculatePrize(kg: Kilogram, ppkg: PrizePerKilogram): AirDeliveryCost = new AirDeliveryCost(kg.x * ppkg.x)
+  sealed trait KiloGram
+  def KiloGram[A](a: A): A @@ KiloGram = Tag[A, KiloGram](a)
+  def kiloGramToValue(mass: Double @@ KiloGram): Double @@ KiloGram = mass
 
-  "value classes" should "have primitive runtime representation but act as types in compile time" in {
-    calculatePrize(new Kilogram(2.0), new PrizePerKilogram(25.0)).x shouldBe 50.0
+  it should "create a new tagged type using the method 'Kilogram'" in {
+    val mass: Int @@ KiloGram = KiloGram(20)
+    2 * Tag.unwrap(mass) shouldBe 40
+    kiloGramToValue(KiloGram(20.0)) shouldBe 20.0
   }
 
-  //
-  // advantage, in runtime the objects are in fact primitive types so the memory overhead is pretty low compared to
-  // the object instance
-  //
+  // lets define another Tagged Type
+  sealed trait JoulePerKiloGram
+  def JoulePerKiloGram[A](a: A): A @@ JoulePerKiloGram = Tag[A, JoulePerKiloGram](a)
 
+  // note: Tag.unsubst removes the Tag, leaving A
+  def relativisticEnergy(mass: Double @@ KiloGram): Double @@ JoulePerKiloGram =
+    JoulePerKiloGram(299792458.0 * 299792458.0 * Tag.unsubst[Double, Id, KiloGram](mass))
+
+  it should "calculate relativisticEnergy using correct types" in {
+    relativisticEnergy(KiloGram(20.0)) shouldBe 1.79751035747363533E18
+  }
 }
