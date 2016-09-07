@@ -9,14 +9,15 @@ libraryDependencies ++= {
   val scalazContribVersion = "0.2"
   Seq(
     "org.scalaz" %% "scalaz-core" % scalazVersion,
-  "org.typelevel" %% "scalaz-contrib-210" % scalazContribVersion,
-  "org.typelevel" %% "scalaz-contrib-validation" % scalazContribVersion,
-  "org.typelevel" %% "scalaz-contrib-undo" % scalazContribVersion,
+//  "org.typelevel" %% "scalaz-contrib-210" % scalazContribVersion,
+//  "org.typelevel" %% "scalaz-contrib-validation" % scalazContribVersion,
+//  "org.typelevel" %% "scalaz-contrib-undo" % scalazContribVersion,
   // currently unavailable because there's no 2.11 build of Lift yet
   // "org.typelevel" %% "scalaz-lift"               % "0.2",
-  "org.typelevel" %% "scalaz-nscala-time" % scalazContribVersion,
-  "org.typelevel" %% "scalaz-spire" % scalazContribVersion,
-  "org.scalatest" %% "scalatest" % "3.0.0" % Test
+//  "org.typelevel" %% "scalaz-nscala-time" % scalazContribVersion,
+//  "org.typelevel" %% "scalaz-spire" % scalazContribVersion,
+  "org.typelevel" %% "scalaz-scalatest" % "1.0.0" % Test,
+  "org.scalatest" %% "scalatest" % "2.2.6" % Test
   )
 }
 

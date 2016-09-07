@@ -28,7 +28,8 @@ class DisjunctionTest extends TestSpec {
     "Success!".right shouldBe
       \/-("Success!")
 
-    "Failure!".left shouldBe
+    // .left gives problems with ScalaTest's .left
+    Disjunction.left("Failure!") shouldBe
       -\/("Failure!")
   }
 
@@ -118,7 +119,8 @@ class DisjunctionTest extends TestSpec {
   }
 
   it should "sequence a list of disjunctions" in {
-    List("foo".left, "bar".left, "baz".right).sequenceU shouldBe -\/("foo")
+    // left gives error with the ScalaTest types
+    List(Disjunction.left("foo"), Disjunction.left("bar"), "baz".right[String]).sequenceU shouldBe -\/("foo")
   }
 
   it should "sequence a list of ValidationNel result in a single (failed) Validation accumulating all errors" in {
@@ -175,7 +177,8 @@ class DisjunctionTest extends TestSpec {
       case -\/(left)  => Future.failed(new RuntimeException(left))
     }.futureValue shouldBe 1
 
-    Future.successful("foo".left[Unit]).flatMap {
+    // .left gives problems with ScalaTest's .left
+    Future.successful(Disjunction.left("foo")).flatMap {
       case \/-(right) => Future.successful(right)
       case -\/(left)  => Future.failed(new RuntimeException(left))
     }.toTry should be a 'failure
