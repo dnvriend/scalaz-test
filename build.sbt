@@ -5,7 +5,7 @@ version := "1.0.0"
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= {
-  val scalazVersion = "7.2.5"
+  val scalazVersion = "7.2.6"
   val scalazContribVersion = "0.2"
   Seq(
     "org.scalaz" %% "scalaz-core" % scalazVersion,

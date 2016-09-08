@@ -113,6 +113,8 @@ Semigroup[Int].append(1,2) == 3
 - [Yann Moisan - Scalaz from the trenches](http://www.yannmoisan.com/scalaz.html)
 - [Mavilein - Error Handling: Comparing Scala's Try with Scalaz's Either/Disjunction](http://mavilein.github.io/scala/2015/09/01/comparing-error-handling-scalas-try-with-scalazs-either-disjunction/)
 - [Underscore.io - Scalaz Monad Transformers](http://underscore.io/blog/posts/2013/12/20/scalaz-monad-transformers.html)
+- [Eugene Yokota - Herding Cats](http://eed3si9n.com/herding-cats/day1.html)
+- [Typelevel - Towards Scalaz (Part 1)](http://typelevel.org/blog/2013/10/13/towards-scalaz-1.html)
 
 ## Videos
 - [Learning Scalaz by Eugene Yokota](https://www.youtube.com/watch?v=jyMIvcUxOJ0)

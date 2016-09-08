@@ -111,6 +111,11 @@ class ApplicativeTest extends TestSpec {
       12.some
   }
 
+  it should "apply" in {
+    val appendOne = (x: String) => x |+| "one"
+    List("a", "b", "c") <*> appendOne.point[List] shouldBe List("aone", "bone", "cone")
+  }
+
   it should 'ApplicativeStyle in {
     // legend:
     // '^' extracts values from two containers and apply them to a single function
@@ -126,7 +131,7 @@ class ApplicativeTest extends TestSpec {
       None
 
     // legend:
-    // '^^' does the same but then for three applicatives
+    // '^^' does the same but then for three x
     ^^(1.some, 2.some, 3.some)(_ |+| _ |+| _) shouldBe
       6.some
 
