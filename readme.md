@@ -104,17 +104,19 @@ Semigroup[Int].append(1,2) == 3
 ## Learning Resources
 
 ## Blogs
+- [Eugene Yokota - Learning Scalaz](http://eed3si9n.com/learning-scalaz/)
+- [Eugene Yokota - Herding Cats](http://eed3si9n.com/herding-cats/day1.html)
+- [Underscore.io - Free Monads Are Simple](http://underscore.io/blog/posts/2015/04/14/free-monads-are-simple.html)
+- [Underscore.io - Scalaz Monad Transformers](http://underscore.io/blog/posts/2013/12/20/scalaz-monad-transformers.html)
 - [Twitter - Effective Scala](http://twitter.github.io/effectivescala/)
 - [Scala: Types of a higher kind by Jed Wesley-Smith](http://blogs.atlassian.com/2013/09/scala-types-of-a-higher-kind/)
-- [Learning Scalaz by Eugene Yokota](http://eed3si9n.com/learning-scalaz/)
 - [The Typeclassopedia by John Kodumal](http://typeclassopedia.bitbucket.org/)
 - [Semigroup by Von Markus Klink](https://inoio.de/blog/2014/07/19/type-class-101-semigroup/)
 - [John Kurkowskiux - Accumulating More Than One Failure In A ValidationNEL](http://johnkurkowski.com/posts/accumulating-multiple-failures-in-a-ValidationNEL/)
 - [Yann Moisan - Scalaz from the trenches](http://www.yannmoisan.com/scalaz.html)
 - [Mavilein - Error Handling: Comparing Scala's Try with Scalaz's Either/Disjunction](http://mavilein.github.io/scala/2015/09/01/comparing-error-handling-scalas-try-with-scalazs-either-disjunction/)
-- [Underscore.io - Scalaz Monad Transformers](http://underscore.io/blog/posts/2013/12/20/scalaz-monad-transformers.html)
-- [Eugene Yokota - Herding Cats](http://eed3si9n.com/herding-cats/day1.html)
 - [Typelevel - Towards Scalaz (Part 1)](http://typelevel.org/blog/2013/10/13/towards-scalaz-1.html)
+- [Denis Kalinin - ScalaZ Disjunctions](http://appliedscala.com/blog/2016/scalaz-disjunctions/)
 
 ## Videos
 - [Learning Scalaz by Eugene Yokota](https://www.youtube.com/watch?v=jyMIvcUxOJ0)
